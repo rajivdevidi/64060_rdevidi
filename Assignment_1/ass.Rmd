@@ -1,0 +1,27 @@
+---
+title: "netflix shows"
+author: "rajiv"
+date: "1/30/2022"
+output: pdf_document
+---
+
+```{r setup}
+#Reference: https://www.kaggle.com/yamqwe/netflix-showse?select=netflix.csv
+data1 = read.csv("C:/Users/rdevi/OneDrive/Desktop/net assign.csv")
+data1
+mean(data1$release.year)
+median(data1$release.year)
+sd(data1$release.year)
+table(data1$ratingLevel)
+#Transforming one variable
+data1$user.rating.score_transformed = data1$user.rating.score + log(data1$user.rating.score)/median(data1$user.rating.score)
+data1$user.rating.score_transformed
+#histogram of one variable
+hist(data1$release.year)
+#scatter plot
+x = data1$release.year
+y = data1$user.rating.score
+plot(x,y,main = "release.year and user.rating", xlab = "release.year", ylab = "user.rating")
+```
+
+

@@ -1,0 +1,120 @@
+---
+title: "ASSIGNMENT3"
+author: "rajiv"
+date: "3/6/2022"
+output: pdf_document
+---
+
+```{r}
+
+ULbank = read.csv("C:\\Users\\rdevi\\Downloads\\UniversalBank.csv")
+View(ULbank)
+
+#loading required libraries
+
+```{r}
+
+library(caret)
+library(ISLR)
+library(e1071)
+
+#converting variables
+
+```{r}
+
+ULbank$Personal.Loan = factor(ULbank$Personal.Loan)
+ULbank$Online = factor(ULbank$Online)
+ULbank$CreditCard = factor(ULbank$CreditCard)
+
+```{r}
+
+set.seed(64060)
+
+#spliting data into training 60% and validatio 40%
+
+Train_Index = createDataPartition(ULbank$Personal.Loan, p = 0.6, list = FALSE)
+Train.df = ULbank[Train_Index,]
+Validation.df = ULbank[-Train_Index]
+
+#Task-A. Create a pivot table for the training data with Online as a column variable, CC as a row variable, and Loan as a secondary row variable.
+
+```{r}
+
+mytable = xtabs(~ CreditCard+Personal.Loan+Online,data = Train.df)
+ftable(mytable)
+
+#Task-B.Consider the task of classifying a customer who owns a bank credit card and is actively using online banking services. Looking at the pivot table, what is the probability that this customer will accept the loan offer? [This is the probability of loan acceptance (Loan = 1) conditional on having a bank credit card (CC = 1) and being an active user of online banking services (Online = 1)].
+
+```{r}
+
+59/(479+59)
+
+#Task-C.Create two separate pivot tables for the training data. One will have Loan (rows) as a unction of Online (columns) and the other will have Loan (rows) as a function of CC. 
+
+```{r}
+
+table(Personal.Loan = Train.df$Personal.Loan, CreditCard = Train.df$CreditCard)
+table(Personal.Loan = Train.df$Personal.Loan, Online = Train.df$Online)
+table(Personal.Loan = Train.df$Personal.Loan)
+
+#Task-D.Compute the following quantities [P(A | B) means “the probability ofA given B”]: 
+
+#1. P(CC = 1 | Loan = 1)
+
+```{r}
+
+93/(93+195)
+
+#2. P(Online = 1 | Loan = 1) 
+
+```{r}
+
+179/(179+109)
+
+#3. P(Loan = 1)
+
+```{r}
+
+288/(288+2712)
+
+#4. P(CC = 1 | Loan = 0)
+
+```{r}
+
+788/(788+1924)
+
+#5 P(Online = 1 | Loan = 0)
+
+```{r}
+
+1631/(1631+1081)
+
+#6 P(Loan = 0) 
+
+```{r}
+
+2712/(2712+288)
+
+#Task-E.Use the quantities computed above to compute the naive Bayes probability P(Loan = 1 | CC = 1, Online = 1).
+
+```{r}
+
+(0.3229167*0.6215278*0.096)/((0.3229167*0.6215278*0.096)+(0.29056052*0.6014012*0.904))
+
+# The value obtained from naivebayes probability is 0.1087106
+
+#Task-F.Compare this value with the one obtained from the pivot table in (B). Which is a more accurate estimate ?
+
+##The value from the pivot table is 0.1096654 and the naive bayes probability is 0.1087106 and these values are almost similar.Pivot table value is more accurate.
+
+
+#Task-G.Which of the entries in this table are needed for computing P(Loan = 1 | CC = 1, Online = 1)? Run naive Bayes on the data. Examine the model output on training data, and find the entry that corresponds to P(Loan = 1 | CC = 1, Online = 1). Compare this to the number you obtained in (E).
+
+```{r}
+
+nb.model = naiveBayes(Personal.Loan~CreditCard+Online, data = Train.df)
+To_Predict = data.frame(CreditCard = 1 , Online = 1)
+predict(nb.model,To_Predict,type = 'raw') 
+
+
+

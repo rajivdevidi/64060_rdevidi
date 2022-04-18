@@ -1,0 +1,83 @@
+---
+title: "Assignment5"
+author: "Rajiv Reddy Devidi"
+date: "4/17/2022"
+output: pdf_document
+---
+
+```{r}
+crls = read.csv("C:\\Users\\rdevi\\Downloads\\Cereals (1).csv")
+View(crls)
+numericaldata = data.frame(crls[,4:16])
+
+#loading required libraries
+library(factoextra)
+library(dendextend)
+library(cluster)
+library(tidyverse)
+
+#omitting all the missing values present in the data
+omitmissing = na.omit(numericaldata)
+
+#normalizing and scaling the data
+normalise = scale(omitmissing)
+
+#measuring distance using the euclidian distance and computing the dissimilarity matrix
+distance = dist(normalise, method = "euclidian")
+
+# hierarchial clustering using complete linkage and representing in plot
+hierarchial_clustering = hclust(distance,method = "complete")
+plot(hierarchial_clustering)
+
+#rounding off the decimals
+round(hierarchial_clustering$height, 4)
+
+#determining the optimla clusters and highlighting with colours
+plot(hierarchial_clustering)
+rect.hclust(hierarchial_clustering,k = 4, border = "red")
+
+#performing clustering using AGNES
+HCsingle = agnes(normalise, method = "single")
+HCcomplete = agnes(normalise, method = "complete")
+HCaverage = agnes(normalise, method = "average")
+HCward = agnes(normalise, method = "ward")
+
+#comparing the agglomerative cosfficients of single , complete, average, ward
+print(HCsingle$ac)
+print(HCcomplete$ac)
+print(HCaverage$ac)
+print(HCward$ac)
+
+#according to the above values, wards method is the best with the value of 0.904.plotting ward using agnes and the dendogram
+pltree(HCward, cex = 0.6, hang = -1, main = "Dendogram of agnes-ward")
+
+#using the ward method for hierarchial clustering
+HC1 <- hclust(distance, method = "ward.D2" )
+subgrp <- cutree(HC1, k = 4)
+table(subgrp)
+crls <- as.data.frame(cbind(normalise,subgrp))
+
+#visualising the results on scatterplot 
+fviz_cluster(list(data = normalise, cluster = subgrp))
+
+#choosing healthy cereal cluster
+newdata = numericaldata
+newdata_omit = na.omit(newdata)
+Clust = cbind(newdata_omit,subgrp)
+Clust[Clust$subgrp==1,]
+
+Clust[Clust$subgrp==2,]
+
+Clust[Clust$subgrp==3,]
+
+Clust[Clust$subgrp==4,]
+
+#here we calculate the mean rating in order determine the healthy cluster cereals
+mean(Clust[Clust$subgrp==1,"rating"])
+mean(Clust[Clust$subgrp==2,"rating"])
+mean(Clust[Clust$subgrp==3,"rating"])
+mean(Clust[Clust$subgrp==4,"rating"])
+
+
+```
+
